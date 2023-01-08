@@ -48,7 +48,7 @@ export default function AppStack() {
                         <Text style={{ fontFamily: "SolaimanLipi_Bold", fontSize: 16, marginLeft: -25, color: { color } }}>রিপোর্ট</Text>
                     ),
                     drawerIcon: ({ color }) => (
-                        <Ionicons name='file' size={22} color={color} />
+                        <Ionicons name='document' size={22} color={color} />
                     )
                 }}
             />

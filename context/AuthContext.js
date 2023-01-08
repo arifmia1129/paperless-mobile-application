@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }) => {
         }
     }
     const [applications, setApplications] = useState([]);
+
     const handleApplications = async () => {
         const applications = await AsyncStorage.getItem("applications");
 

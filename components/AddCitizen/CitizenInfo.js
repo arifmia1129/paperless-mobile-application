@@ -10,11 +10,12 @@ import axios from 'axios';
 import AppLoadingIndicator from '../Shared/AppLoadingIndicator';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 export default function CitizenInfo() {
-    const { user, logOut } = useContext(AuthContext);
+    const { user, logOut, handleApplications } = useContext(AuthContext);
 
-    const { profession, village, handleApplications } = user;
+    const { profession, village } = user;
 
     const [villageId, setVillageId] = useState("");
     const [professionId, setProfessionId] = useState("");
@@ -24,6 +25,8 @@ export default function CitizenInfo() {
 
 
     const villages = village.filter(v => Number(v.ward_number) === 1);
+
+    const navigation = useNavigation();
 
     const gender = [
         { id: "MALE", title: "পুরুষ" },
@@ -101,6 +104,7 @@ export default function CitizenInfo() {
                 title: <View><Text style={{ fontFamily: "SolaimanLipi_Bold", fontWeight: "bold", fontSize: 25 }}>Congratulation</Text></View>,
                 textBody: <Text style={{ fontFamily: "SolaimanLipi_Bold" }}>Application ID: {data?.app_id}</Text>
             })
+            navigation.navigate("Reports");
         } catch (error) {
             logOut()
             setLoading(false);
@@ -142,7 +146,7 @@ export default function CitizenInfo() {
             textBody: <Text style={{ fontFamily: "SolaimanLipi_Bold" }}>Application Successfully Save in Offline</Text>
         })
         handleApplications();
-        navigator.navigator("OfflineApplication");
+        navigation.navigate("OfflineApplications");
     }
 
     if (loading) {
