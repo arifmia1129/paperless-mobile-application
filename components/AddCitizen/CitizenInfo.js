@@ -36,7 +36,8 @@ export default function CitizenInfo() {
         { id: "birth", title: "জন্ম সনদ" }
     ]
 
-    const { handleSubmit, formState: { errors }, control, resetField } = useForm({ mode: 'onBlur' });
+    const { handleSubmit, formState: { errors }, control } = useForm({ mode: 'onBlur' });
+
     const onSubmit = async ({ dob, mobile, name, guardianName, motherName, id }, e) => {
         if (!villageId || !professionId || !genderId || !docType) {
             return Dialog.show({
@@ -46,7 +47,6 @@ export default function CitizenInfo() {
             })
         }
 
-        setLoading(true);
         const information = {
             source: "app",
             gender: genderId,
@@ -60,7 +60,6 @@ export default function CitizenInfo() {
             dob,
             profession_id: professionId
         }
-        setLoading(false)
         return Dialog.show({
             type: ALERT_TYPE.WARNING,
             title: <View><Text style={{ fontFamily: "SolaimanLipi_Bold", fontWeight: "bold", fontSize: 16 }}>আবেদনের সংরক্ষনের ধরন</Text></View>,
@@ -69,16 +68,17 @@ export default function CitizenInfo() {
                     <Text style={{ color: "#fff", fontFamily: "SolaimanLipi_Bold", textAlign: "center", fontSize: 14, marginRight: 4 }}>অফলাইন</Text>
                     <Ionicons name='cloud-offline' size={25} color="#fff" />
                 </TouchableOpacity>
-                <TouchableOpacity style={{ backgroundColor: "#FF6C37", width: vw(30), paddingHorizontal: 5, borderRadius: 5, paddingVertical: 10, flexDirection: "row", alignItems: "center", justifyContent: "center", marginHorizontal: 5 }}>
+                <TouchableOpacity onPress={() => handleSubmitOnline(information)} style={{ backgroundColor: "#FF6C37", width: vw(30), paddingHorizontal: 5, borderRadius: 5, paddingVertical: 10, flexDirection: "row", alignItems: "center", justifyContent: "center", marginHorizontal: 5 }}>
                     <Text style={{ color: "#fff", fontFamily: "SolaimanLipi_Bold", textAlign: "center", fontSize: 14, marginRight: 4 }}>অনলাইন</Text>
                     <Ionicons name='cloud' size={25} color="#fff" />
                 </TouchableOpacity>
             </View>
         })
+    };
 
+    const handleSubmitOnline = async (information) => {
+        setLoading(true);
         try {
-
-
             const { data } = await axios.post("https://bdfast.app/api/v1/paper/less/image/no", information, {
                 headers: {
                     'Accept': 'application/json',
@@ -110,8 +110,8 @@ export default function CitizenInfo() {
                 textBody: <Text style={{ fontFamily: "SolaimanLipi_Bold" }}>{error?.message}</Text>
             })
         }
-        setLoading(false);
-    };
+    }
+
 
     if (loading) {
         return <AppLoadingIndicator />
