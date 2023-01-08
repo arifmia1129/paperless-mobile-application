@@ -9,7 +9,7 @@ import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import axios from 'axios';
 import AppLoadingIndicator from '../Shared/AppLoadingIndicator';
 import Ionicons from "react-native-vector-icons/Ionicons";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CitizenInfo() {
     const { user, logOut } = useContext(AuthContext);
@@ -64,7 +64,7 @@ export default function CitizenInfo() {
             type: ALERT_TYPE.WARNING,
             title: <View><Text style={{ fontFamily: "SolaimanLipi_Bold", fontWeight: "bold", fontSize: 16 }}>আবেদনের সংরক্ষনের ধরন</Text></View>,
             textBody: <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <TouchableOpacity style={{ backgroundColor: "#00E0C1", width: vw(30), paddingHorizontal: 5, borderRadius: 5, paddingVertical: 10, flexDirection: "row", alignItems: "center", justifyContent: "center", marginHorizontal: 5 }}>
+                <TouchableOpacity onPress={() => handleSubmitOffline(information)} style={{ backgroundColor: "#00E0C1", width: vw(30), paddingHorizontal: 5, borderRadius: 5, paddingVertical: 10, flexDirection: "row", alignItems: "center", justifyContent: "center", marginHorizontal: 5 }}>
                     <Text style={{ color: "#fff", fontFamily: "SolaimanLipi_Bold", textAlign: "center", fontSize: 14, marginRight: 4 }}>অফলাইন</Text>
                     <Ionicons name='cloud-offline' size={25} color="#fff" />
                 </TouchableOpacity>
@@ -112,6 +112,38 @@ export default function CitizenInfo() {
         }
     }
 
+    const handleSubmitOffline = async (information) => {
+        const application = { id: Date.now(), ...information };
+
+        const applications = await AsyncStorage.getItem("applications");
+
+        console.log(applications);
+
+        if (!applications) {
+            await AsyncStorage.setItem("applications", JSON.stringify([application]))
+        } else {
+            const previousApplications = JSON.parse(applications);
+
+            const duplicate = previousApplications.find(application => application.card_number === information.card_number && application.dob === information.dob);
+
+            if (duplicate) {
+                return Dialog.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: <View><Text style={{ fontFamily: "SolaimanLipi_Bold", fontWeight: "bold", fontSize: 25 }}>Error</Text></View>,
+                    textBody: <Text style={{ fontFamily: "SolaimanLipi_Bold" }}>ইতিমধ্যে নিবন্ধিত রয়েছে</Text>
+                })
+            }
+
+            previousApplications.push(application);
+
+            await AsyncStorage.setItem("applications", JSON.stringify(previousApplications))
+        }
+        Dialog.show({
+            type: ALERT_TYPE.SUCCESS,
+            title: <View><Text style={{ fontFamily: "SolaimanLipi_Bold", fontWeight: "bold", fontSize: 25 }}>Congratulation</Text></View>,
+            textBody: <Text style={{ fontFamily: "SolaimanLipi_Bold" }}>Application Successfully Save in Offline</Text>
+        })
+    }
 
     if (loading) {
         return <AppLoadingIndicator />
