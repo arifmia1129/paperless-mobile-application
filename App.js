@@ -1,12 +1,35 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import { useFonts } from 'expo-font';
+import 'react-native-gesture-handler';
+import Login from './pages/Authentication/Login';
+import { AlertNotificationRoot } from 'react-native-alert-notification';
+import AddCitizen from './pages/AddCitizen/AddCitizen';
+import AppStack from './navigation/AppStack';
+import { NavigationContainer } from '@react-navigation/native';
+import AppNav from './navigation/AppNav';
+import { AuthProvider } from './context/AuthContext';
 
 export default function App() {
+  let [fontsLoaded] = useFonts({
+    'SolaimanLipi_Bold': require('./assets/fonts/SolaimanLipi_Bold.ttf'),
+  });
+  if (!fontsLoaded) {
+    return null;
+  }
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+    <AuthProvider>
+      <AlertNotificationRoot>
+        {/* <Login /> */}
+        {/* <AddCitizen /> */}
+        {/* <AuthStack /> */}
+        {/* <AppStack /> */}
+        <AppNav />
+      </AlertNotificationRoot>
+
       <StatusBar style="auto" />
-    </View>
+    </AuthProvider>
+
   );
 }
 
