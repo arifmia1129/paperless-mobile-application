@@ -14,7 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function CitizenInfo() {
     const { user, logOut } = useContext(AuthContext);
 
-    const { profession, village } = user;
+    const { profession, village, handleApplications } = user;
 
     const [villageId, setVillageId] = useState("");
     const [professionId, setProfessionId] = useState("");
@@ -117,8 +117,6 @@ export default function CitizenInfo() {
 
         const applications = await AsyncStorage.getItem("applications");
 
-        console.log(applications);
-
         if (!applications) {
             await AsyncStorage.setItem("applications", JSON.stringify([application]))
         } else {
@@ -143,11 +141,14 @@ export default function CitizenInfo() {
             title: <View><Text style={{ fontFamily: "SolaimanLipi_Bold", fontWeight: "bold", fontSize: 25 }}>Congratulation</Text></View>,
             textBody: <Text style={{ fontFamily: "SolaimanLipi_Bold" }}>Application Successfully Save in Offline</Text>
         })
+        handleApplications();
+        navigator.navigator("OfflineApplication");
     }
 
     if (loading) {
         return <AppLoadingIndicator />
     }
+
     return (
         <ScrollView>
             <View style={{ padding: 10, backgroundColor: "#fff" }}>
@@ -160,7 +161,7 @@ export default function CitizenInfo() {
                                 return <TouchableOpacity key={id} onPress={() => {
                                     setVillageId(id);
                                 }} style={[villageId === village?.id ? styles.selectButtonVillage : styles.unselectButtonVillage]}>
-                                    <Text style={[villageId === village?.id ? styles.selectText : styles.unselectText]}>{village_bn}</Text>
+                                    <Text style={[villageId === village?.id ? styles.selectText : styles.unselectText]}>{village_bn}-{post_office_bn}</Text>
                                 </TouchableOpacity>
                             })
                         }

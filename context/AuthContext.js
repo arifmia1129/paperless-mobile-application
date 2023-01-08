@@ -37,17 +37,26 @@ export const AuthProvider = ({ children }) => {
             Alert.alert(e?.message ? e?.message : "Login problem");
         }
     }
+    const [applications, setApplications] = useState([]);
+    const handleApplications = async () => {
+        const applications = await AsyncStorage.getItem("applications");
 
+        if (Array.isArray(JSON.parse(applications))) {
+            setApplications(JSON.parse(applications));
+        } else {
+            setApplications([]);
+        }
+    }
 
     useEffect(() => {
         isLoggedIn();
+        handleApplications();
     }, [])
 
 
 
     return (
-
-        <AuthContext.Provider value={{ logIn, logOut, user, isLoading }}>
+        <AuthContext.Provider value={{ logIn, logOut, user, isLoading, applications, handleApplications }}>
             {children}
         </AuthContext.Provider>
     )

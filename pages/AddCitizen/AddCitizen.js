@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 export default function AddCitizen() {
     const navigation = useNavigation();
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{ backgroundColor: "#fff" }}>
             <View style={{ flexDirection: 'row', justifyContent: "space-between", backgroundColor: "#00E0C1", width: vw(100), height: 60, alignItems: "center", paddingHorizontal: 15, paddingTop: 10, borderBottomEndRadius: 10, borderBottomStartRadius: 10 }}>
                 <TouchableOpacity onPress={() => navigation.openDrawer()}>
                     <Ionicons name='menu' size={25} color="#fff" />
