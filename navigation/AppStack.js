@@ -16,8 +16,11 @@ const Drawer = createDrawerNavigator();
 
 export default function AppStack() {
 
-    const { totalGetQuota, totalUsedQuota } = useContext(AuthContext);
+    const { totalGetQuota, totalUsedQuota, handleQuotaInfo } = useContext(AuthContext);
 
+    useEffect(() => {
+        handleQuotaInfo();
+    }, [])
 
     return (
         <Drawer.Navigator
