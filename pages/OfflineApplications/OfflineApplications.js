@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, StyleSheet, StatusBar } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { vh, vw } from 'react-native-expo-viewport-units';
@@ -28,12 +28,12 @@ export default function OfflineApplications() {
     const navigation = useNavigation();
 
     return (
-        <SafeAreaView style={{ backgroundColor: "#fff", height: vh(100) }}>
-            <View style={{ flexDirection: 'row', justifyContent: "space-between", backgroundColor: "#00E0C1", width: vw(100), height: 60, alignItems: "center", paddingHorizontal: 15, paddingTop: 10, borderBottomEndRadius: 10, borderBottomStartRadius: 10 }}>
+        <SafeAreaView style={{ backgroundColor: "#fff", height: vh(100), marginTop: StatusBar.currentHeight }}>
+            <View style={{ flexDirection: 'row', justifyContent: "space-between", backgroundColor: "#00E0C1", width: vw(100), height: 60, alignItems: "center", paddingHorizontal: 15, borderBottomEndRadius: 10, borderBottomStartRadius: 10 }}>
                 <TouchableOpacity onPress={() => navigation.openDrawer()}>
                     <Ionicons name='menu' size={25} color="#fff" />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.openDrawer()}>
                     <Ionicons name='person' size={25} color="#fff" />
                 </TouchableOpacity>
 

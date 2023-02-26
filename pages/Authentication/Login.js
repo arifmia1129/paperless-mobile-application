@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, Image, ScrollView, StyleSheet, TouchableOpacity, Alert, ImageBackground, Platform, TextInput } from 'react-native';
+import { View, Text, SafeAreaView, Image, ScrollView, StyleSheet, TouchableOpacity, Alert, ImageBackground, Platform, TextInput, StatusBar, KeyboardAvoidingView } from 'react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import AppLoadingIndicator from '../../components/Shared/AppLoadingIndicator';
 import { vw, vh } from 'react-native-expo-viewport-units';
@@ -13,7 +13,7 @@ export default function Login() {
 
     const { logIn } = useContext(AuthContext);
 
-    const { register, handleSubmit, watch, formState: { errors }, control } = useForm({ mode: 'onBlur' });
+    const { register, handleSubmit, watch, formState: { errors }, control } = useForm({ mode: 'onChange' });
     const onSubmit = async ({ mobile, pin }) => {
         setLoading(true);
         try {
@@ -46,13 +46,15 @@ export default function Login() {
     }
 
     return (
-        <SafeAreaView>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={{ backgroundColor: "#00E0C1", width: vw(100) }}>
-                    <ScrollView showsVerticalScrollIndicator={false} style={{ height: vh(100) }}>
-                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: "center", backgroundColor: '#fff' }}>
+        <SafeAreaView style={{ marginTop: StatusBar.currentHeight }}>
+            <View style={{ backgroundColor: "#00E0C1", width: vw(100), height: vh(100) }}>
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+                    <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
+                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: "center", backgroundColor: '#fff', width: vw(100), height: 300 }}>
                             <Image style={{
-                                width: vw(80), marginVertical: 20
+                                height: "100%",
+                                width: "100%",
+                                resizeMode: "contain"
                             }} source={require('../../assets/login.png')} />
                         </View>
                         <View style={{ padding: 20 }}>
@@ -120,17 +122,13 @@ export default function Login() {
                                 <Text style={{ fontFamily: "SolaimanLipi_Bold", color: "#fff", textAlign: "right", marginTop: 5, marginBottom: 20 }}>পাসওয়ার্ড ভুলে গেছেন?</Text>
                             </TouchableOpacity>
 
-                            {/* <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-                                <Text style={{ fontFamily: "SolaimanLipi_Bold", color: "#fff", textAlign: "center", marginVertical: 5, fontSize: 15 }}>একাউন্ট নেই? রেজিষ্টার করুন</Text>
-                            </TouchableOpacity> */}
-
                             <TouchableOpacity onPress={handleSubmit(onSubmit)} style={{ height: 40, width: vw(90), flexDirection: 'row', justifyContent: "center", alignItems: "center", borderWidth: 2, borderColor: "#fff", borderRadius: 10 }}>
                                 <Text style={{ fontFamily: "SolaimanLipi_Bold", color: "#fff", fontSize: 22 }}>লগইন</Text>
                             </TouchableOpacity>
                         </View>
                     </ScrollView>
-                </View>
-            </ScrollView>
+                </KeyboardAvoidingView>
+            </View>
         </SafeAreaView>
     )
 }

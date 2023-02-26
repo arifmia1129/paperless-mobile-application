@@ -1,6 +1,7 @@
 import React, { createContext, useEffect, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from "react-native";
+import axios from "axios";
 
 export const AuthContext = createContext();
 
@@ -49,15 +50,48 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
+    const [totalGetQuota, setTotalGetQuota] = useState(0);
+    const [totalUsedQuota, setTotalUsedQuota] = useState(0);
+
+
+    const handleQuotaInfo = async () => {
+        try {
+            const { data } = await axios.get("https://bdfast.app/api/v1/paper/less/quota", {
+                headers: {
+                    Authorization: `Bearer ${user?.token}`
+                }
+            })
+
+            if (data.success) {
+                setTotalGetQuota(data?.quota);
+                setTotalUsedQuota(data?.fill);
+            }
+        } catch (error) {
+
+        }
+    }
+
+
     useEffect(() => {
         isLoggedIn();
         handleApplications();
+        handleQuotaInfo();
     }, [])
 
-
+    const value = {
+        logIn,
+        logOut,
+        user,
+        isLoading,
+        applications,
+        handleApplications,
+        totalGetQuota,
+        totalUsedQuota,
+        handleQuotaInfo
+    }
 
     return (
-        <AuthContext.Provider value={{ logIn, logOut, user, isLoading, applications, handleApplications }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     )

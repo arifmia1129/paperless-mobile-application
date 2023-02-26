@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Paper Less",
+    "name": "PAPER LESS",
     "slug": "paperless",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -26,15 +26,10 @@
         "backgroundColor": "#FFFFFF"
       },
       "versionCode": 1,
-      "package": "com.arifmia.paperless"
+      "package": "com.sebaautomation.paperless"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "2f67561c-786f-4db9-9542-2c574ca99657"
-      }
     }
   }
 }

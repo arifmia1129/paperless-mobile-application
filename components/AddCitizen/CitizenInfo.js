@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView } from 'react-native'
 import React, { useContext, useState } from 'react'
 import { vw, vh } from 'react-native-expo-viewport-units';
 import { useForm, Controller } from "react-hook-form";
@@ -13,9 +13,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
 export default function CitizenInfo() {
-    const { user, logOut, handleApplications } = useContext(AuthContext);
+    const { user, handleQuotaInfo, handleApplications } = useContext(AuthContext);
 
-    const { profession, village } = user;
+    const { profession, village } = user || {};
 
     const [villageId, setVillageId] = useState("");
     const [professionId, setProfessionId] = useState("");
@@ -39,7 +39,17 @@ export default function CitizenInfo() {
         { id: "birth", title: "জন্ম সনদ" }
     ]
 
-    const { handleSubmit, formState: { errors }, control } = useForm({ mode: 'onBlur' });
+    const { handleSubmit, formState: { errors }, control, reset } = useForm({
+        mode: 'onChange', defaultValues: {
+            mobile: "",
+            name: "",
+            guardianName: "",
+            motherName: "",
+            id: "",
+            dob: "",
+            professionId: ""
+        }
+    });
 
     const onSubmit = async ({ dob, mobile, name, guardianName, motherName, id }, e) => {
         if (!villageId || !professionId || !genderId || !docType) {
@@ -63,6 +73,7 @@ export default function CitizenInfo() {
             dob,
             profession_id: professionId
         }
+
         return Dialog.show({
             type: ALERT_TYPE.WARNING,
             title: <View><Text style={{ fontFamily: "SolaimanLipi_Bold", fontWeight: "bold", fontSize: 16 }}>আবেদনের সংরক্ষনের ধরন</Text></View>,
@@ -105,8 +116,12 @@ export default function CitizenInfo() {
                 textBody: <Text style={{ fontFamily: "SolaimanLipi_Bold" }}>Application ID: {data?.app_id}</Text>
             })
             navigation.navigate("Reports");
+            setVillageId("");
+            setDocType("");
+            setGenderId("");
+            reset();
+            handleQuotaInfo();
         } catch (error) {
-            logOut()
             setLoading(false);
             Dialog.show({
                 type: ALERT_TYPE.DANGER,
@@ -147,6 +162,11 @@ export default function CitizenInfo() {
         })
         handleApplications();
         navigation.navigate("OfflineApplications");
+        setVillageId("");
+        setDocType("");
+        setGenderId("");
+        reset();
+        handleQuotaInfo();
     }
 
     if (loading) {
@@ -154,289 +174,293 @@ export default function CitizenInfo() {
     }
 
     return (
-        <ScrollView>
-            <View style={{ padding: 10, backgroundColor: "#fff" }}>
-                <View style={{ flex: 1, alignItems: "center" }}>
-                    <Text style={{ fontFamily: "SolaimanLipi_Bold", color: "#fff", backgroundColor: "#00E0C1", width: vw(90), padding: 10, borderRadius: 10, textAlign: "center" }}>গ্রাম নির্বাচন করুন</Text>
-                    <View style={{ marginHorizontal: 30, marginBottom: 20 }}>
-                        {
-                            villages?.map((village) => {
-                                const { village_bn, post_office_bn, id } = village;
-                                return <TouchableOpacity key={id} onPress={() => {
-                                    setVillageId(id);
-                                }} style={[villageId === village?.id ? styles.selectButtonVillage : styles.unselectButtonVillage]}>
-                                    <Text style={[villageId === village?.id ? styles.selectText : styles.unselectText]}>{village_bn}-{post_office_bn}</Text>
-                                </TouchableOpacity>
-                            })
-                        }
-                    </View>
-                    <SelectDropdown
-                        buttonStyle={{ width: "100%", height: 40, borderWidth: 1, borderColor: "#00E0C1", borderRadius: 5, backgroundColor: "#fff", marginTop: 5 }}
-                        buttonTextStyle={{ fontFamily: "SolaimanLipi_Bold", color: "black", textAlign: "left", fontSize: 16 }}
-                        rowTextStyle={{ fontFamily: "SolaimanLipi_Bold" }}
-                        defaultButtonText="পেশা"
-                        data={profession}
-                        onSelect={(selectedItem) => {
-                            setProfessionId(selectedItem.id);
-                        }}
-                        buttonTextAfterSelection={(selectedItem) => {
-                            return selectedItem.bangla;
-                        }}
-                        rowTextForSelection={(item) => {
-                            return item.bangla;
-                        }}
-                    />
-                    <View>
-                        <View>
-                            <Controller
-                                control={control}
-                                name="mobile"
-                                render={({ field: { onChange, value, onBlur } }) => (
-                                    <TextInput
-                                        value={value}
-                                        onBlur={onBlur}
-                                        style={styles.input}
-                                        inputStyle={styles.inputStyle}
-                                        labelStyle={styles.labelStyle}
-                                        placeholderStyle={styles.placeholderStyle}
-                                        textErrorStyle={styles.textErrorStyle}
-                                        label="মোবাইল নাম্বার"
-                                        placeholder="মোবাইল নাম্বার লিখুন"
-                                        placeholderTextColor="gray"
-                                        focusColor="#00E0C1"
-                                        keyboardType='phone-pad'
-                                        maxLength={11}
-                                        onChangeText={value => {
-                                            onChange(value);
-                                        }}
-                                    />
-                                )}
-                                rules={{
-                                    required: {
-                                        value: true,
-                                        message: 'মোবাইল নাম্বার আবশ্যক'
-                                    },
-                                    minLength: {
-                                        value: 11,
-                                        message: "মোবাইল নাম্বার ১১ সংখ্যায় হবে"
-                                    }
+        <View style={{ height: vh(100) - 60 }}>
+            <KeyboardAvoidingView behavior="padding">
+                <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+                    <View style={{ padding: 10, backgroundColor: "#fff" }}>
+                        <View style={{ flex: 1, alignItems: "center" }}>
+                            <Text style={{ fontFamily: "SolaimanLipi_Bold", color: "#fff", backgroundColor: "#00E0C1", width: vw(90), padding: 10, borderRadius: 10, textAlign: "center" }}>গ্রাম নির্বাচন করুন</Text>
+                            <View style={{ marginHorizontal: 30, marginBottom: 20 }}>
+                                {
+                                    villages?.map((village) => {
+                                        const { village_bn, id } = village;
+                                        return <TouchableOpacity key={id} onPress={() => {
+                                            setVillageId(id);
+                                        }} style={[villageId === village?.id ? styles.selectButtonVillage : styles.unselectButtonVillage]}>
+                                            <Text style={[villageId === village?.id ? styles.selectText : styles.unselectText]}>{village_bn}</Text>
+                                        </TouchableOpacity>
+                                    })
+                                }
+                            </View>
+                            <SelectDropdown
+                                buttonStyle={{ width: "100%", height: 40, borderWidth: 1, borderColor: "#00E0C1", borderRadius: 5, backgroundColor: "#fff", marginTop: 5 }}
+                                buttonTextStyle={{ fontFamily: "SolaimanLipi_Bold", color: "black", textAlign: "left", fontSize: 16 }}
+                                rowTextStyle={{ fontFamily: "SolaimanLipi_Bold" }}
+                                defaultButtonText="পেশা"
+                                data={profession}
+                                onSelect={(selectedItem) => {
+                                    setProfessionId(selectedItem.id);
+                                }}
+                                buttonTextAfterSelection={(selectedItem) => {
+                                    return selectedItem.bangla;
+                                }}
+                                rowTextForSelection={(item) => {
+                                    return item.bangla;
                                 }}
                             />
                             <View>
-                                {errors.mobile && <Text style={{ fontFamily: "SolaimanLipi_Bold", color: 'red', marginLeft: 2 }}>{errors.mobile?.message}</Text>}
-                            </View>
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-                            {
-                                docTypes?.map(type => <TouchableOpacity key={type.id} onPress={() => {
-                                    setDocType(type.id);
-                                }} style={[docType === type.id ? styles.selectButton : styles.unselectButton]}>
-                                    <Text style={[docType === type.id ? styles.selectText : styles.unselectText]}>{type.title}</Text>
-                                </TouchableOpacity>)
-                            }
-                        </View>
-                        <View>
-                            <Controller
-                                control={control}
-                                name="id"
-                                render={({ field: { onChange, value, onBlur } }) => (
-                                    <TextInput
-                                        value={value}
-                                        onBlur={onBlur}
-                                        style={styles.input}
-                                        inputStyle={styles.inputStyle}
-                                        labelStyle={styles.labelStyle}
-                                        placeholderStyle={styles.placeholderStyle}
-                                        textErrorStyle={styles.textErrorStyle}
-                                        label="জন্ম সনদ/NID নাম্বার"
-                                        placeholder="জন্ম সনদ/NID নাম্বার নাম্বার লিখুন"
-                                        placeholderTextColor="gray"
-                                        focusColor="#00E0C1"
-                                        keyboardType='phone-pad'
-                                        maxLength={17}
-                                        onChangeText={value => {
-                                            onChange(value);
+                                <View>
+                                    <Controller
+                                        control={control}
+                                        name="mobile"
+                                        render={({ field: { onChange, value, onBlur } }) => (
+                                            <TextInput
+                                                value={value}
+                                                onBlur={onBlur}
+                                                style={styles.input}
+                                                inputStyle={styles.inputStyle}
+                                                labelStyle={styles.labelStyle}
+                                                placeholderStyle={styles.placeholderStyle}
+                                                textErrorStyle={styles.textErrorStyle}
+                                                label="মোবাইল নাম্বার"
+                                                placeholder="মোবাইল নাম্বার লিখুন"
+                                                placeholderTextColor="gray"
+                                                focusColor="#00E0C1"
+                                                keyboardType='phone-pad'
+                                                maxLength={11}
+                                                onChangeText={value => {
+                                                    onChange(value);
+                                                }}
+                                            />
+                                        )}
+                                        rules={{
+                                            required: {
+                                                value: true,
+                                                message: 'মোবাইল নাম্বার আবশ্যক'
+                                            },
+                                            minLength: {
+                                                value: 11,
+                                                message: "মোবাইল নাম্বার ১১ সংখ্যায় হবে"
+                                            }
                                         }}
                                     />
-                                )}
-                                rules={{
-                                    required: {
-                                        value: true,
-                                        message: 'জন্ম সনদ/NID নাম্বার আবশ্যক'
-                                    },
-                                    minLength: {
-                                        value: 10,
-                                        message: "জন্ম সনদ/NID নাম্বার ১০/১৩/১৭ সংখ্যায় হবে"
-                                    },
-                                    maxLength: {
-                                        value: 17,
-                                        message: "জন্ম সনদ/NID নাম্বার ১০/১৩/১৭ সংখ্যায় হবে"
+                                    <View>
+                                        {errors.mobile && <Text style={{ fontFamily: "SolaimanLipi_Bold", color: 'red', marginLeft: 2 }}>{errors.mobile?.message}</Text>}
+                                    </View>
+                                </View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+                                    {
+                                        docTypes?.map(type => <TouchableOpacity key={type.id} onPress={() => {
+                                            setDocType(type.id);
+                                        }} style={[docType === type.id ? styles.selectButton : styles.unselectButton]}>
+                                            <Text style={[docType === type.id ? styles.selectText : styles.unselectText]}>{type.title}</Text>
+                                        </TouchableOpacity>)
                                     }
-                                }}
-                            />
-                            <View>
-                                {errors.id && <Text style={{ fontFamily: "SolaimanLipi_Bold", color: 'red', marginLeft: 2 }}>{errors.id?.message}</Text>}
-                            </View>
-                        </View>
-                        <View>
-                            <Controller
-                                control={control}
-                                name="dob"
-                                render={({ field: { onChange, value, onBlur } }) => (
-                                    <TextInput
-                                        value={value}
-                                        onBlur={onBlur}
-                                        style={styles.input}
-                                        inputStyle={styles.inputStyle}
-                                        labelStyle={styles.labelStyle}
-                                        placeholderStyle={styles.placeholderStyle}
-                                        textErrorStyle={styles.textErrorStyle}
-                                        label="জন্ম তারিখ"
-                                        placeholder="দিন-মাস-বছর"
-                                        placeholderTextColor="gray"
-                                        focusColor="#00E0C1"
-                                        keyboardType='phone-pad'
-                                        maxLength={10}
-                                        onChangeText={value => {
-                                            onChange(value);
+                                </View>
+                                <View>
+                                    <Controller
+                                        control={control}
+                                        name="id"
+                                        render={({ field: { onChange, value, onBlur } }) => (
+                                            <TextInput
+                                                value={value}
+                                                onBlur={onBlur}
+                                                style={styles.input}
+                                                inputStyle={styles.inputStyle}
+                                                labelStyle={styles.labelStyle}
+                                                placeholderStyle={styles.placeholderStyle}
+                                                textErrorStyle={styles.textErrorStyle}
+                                                label="জন্ম সনদ/NID নাম্বার"
+                                                placeholder="জন্ম সনদ/NID নাম্বার নাম্বার লিখুন"
+                                                placeholderTextColor="gray"
+                                                focusColor="#00E0C1"
+                                                keyboardType='phone-pad'
+                                                maxLength={17}
+                                                onChangeText={value => {
+                                                    onChange(value);
+                                                }}
+                                            />
+                                        )}
+                                        rules={{
+                                            required: {
+                                                value: true,
+                                                message: 'জন্ম সনদ/NID নাম্বার আবশ্যক'
+                                            },
+                                            minLength: {
+                                                value: 10,
+                                                message: "জন্ম সনদ/NID নাম্বার ১০/১৩/১৭ সংখ্যায় হবে"
+                                            },
+                                            maxLength: {
+                                                value: 17,
+                                                message: "জন্ম সনদ/NID নাম্বার ১০/১৩/১৭ সংখ্যায় হবে"
+                                            }
                                         }}
                                     />
-                                )}
-                                rules={{
-                                    required: {
-                                        value: true,
-                                        message: 'জন্ম তারিখ আবশ্যক'
-                                    },
-                                    minLength: {
-                                        value: 10,
-                                        message: "31-12-2002 এই ফরম্যাট অনুযায়ী জন্ম তারিখ লিখুন"
-                                    }
-                                }}
-                            />
-                            <View>
-                                {errors.dob && <Text style={{ fontFamily: "SolaimanLipi_Bold", color: 'red', marginLeft: 2 }}>{errors.dob?.message}</Text>}
-                            </View>
-                        </View>
-                        <View>
-                            <Controller
-                                control={control}
-                                name="name"
-                                render={({ field: { onChange, value, onBlur } }) => (
-                                    <TextInput
-                                        value={value}
-                                        onBlur={onBlur}
-                                        style={styles.input}
-                                        inputStyle={styles.inputStyle}
-                                        labelStyle={styles.labelStyle}
-                                        placeholderStyle={styles.placeholderStyle}
-                                        textErrorStyle={styles.textErrorStyle}
-                                        label="নাম"
-                                        placeholder="নাম লিখুন"
-                                        placeholderTextColor="gray"
-                                        focusColor="#00E0C1"
-                                        onChangeText={value => {
-                                            onChange(value);
+                                    <View>
+                                        {errors.id && <Text style={{ fontFamily: "SolaimanLipi_Bold", color: 'red', marginLeft: 2 }}>{errors.id?.message}</Text>}
+                                    </View>
+                                </View>
+                                <View>
+                                    <Controller
+                                        control={control}
+                                        name="dob"
+                                        render={({ field: { onChange, value, onBlur } }) => (
+                                            <TextInput
+                                                value={value}
+                                                onBlur={onBlur}
+                                                style={styles.input}
+                                                inputStyle={styles.inputStyle}
+                                                labelStyle={styles.labelStyle}
+                                                placeholderStyle={styles.placeholderStyle}
+                                                textErrorStyle={styles.textErrorStyle}
+                                                label="জন্ম তারিখ"
+                                                placeholder="দিন-মাস-বছর"
+                                                placeholderTextColor="gray"
+                                                focusColor="#00E0C1"
+                                                keyboardType='phone-pad'
+                                                maxLength={10}
+                                                onChangeText={value => {
+                                                    onChange(value);
+                                                }}
+                                            />
+                                        )}
+                                        rules={{
+                                            required: {
+                                                value: true,
+                                                message: 'জন্ম তারিখ আবশ্যক'
+                                            },
+                                            minLength: {
+                                                value: 10,
+                                                message: "31-12-2002 এই ফরম্যাট অনুযায়ী জন্ম তারিখ লিখুন"
+                                            }
                                         }}
                                     />
-                                )}
-                                rules={{
-                                    required: {
-                                        value: true,
-                                        message: 'নাম আবশ্যক'
-                                    }
-                                }}
-                            />
-                            <View>
-                                {errors.name && <Text style={{ fontFamily: "SolaimanLipi_Bold", color: 'red', marginLeft: 2 }}>{errors.name?.message}</Text>}
-                            </View>
-                        </View>
-                        <View>
-                            <Controller
-                                control={control}
-                                name="guardianName"
-                                render={({ field: { onChange, value, onBlur } }) => (
-                                    <TextInput
-                                        value={value}
-                                        onBlur={onBlur}
-                                        style={styles.input}
-                                        inputStyle={styles.inputStyle}
-                                        labelStyle={styles.labelStyle}
-                                        placeholderStyle={styles.placeholderStyle}
-                                        textErrorStyle={styles.textErrorStyle}
-                                        label="পিতা/স্বামীর নাম"
-                                        placeholder="পিতা/স্বামীর নাম লিখুন"
-                                        placeholderTextColor="gray"
-                                        focusColor="#00E0C1"
-                                        onChangeText={value => {
-                                            onChange(value);
+                                    <View>
+                                        {errors.dob && <Text style={{ fontFamily: "SolaimanLipi_Bold", color: 'red', marginLeft: 2 }}>{errors.dob?.message}</Text>}
+                                    </View>
+                                </View>
+                                <View>
+                                    <Controller
+                                        control={control}
+                                        name="name"
+                                        render={({ field: { onChange, value, onBlur } }) => (
+                                            <TextInput
+                                                value={value}
+                                                onBlur={onBlur}
+                                                style={styles.input}
+                                                inputStyle={styles.inputStyle}
+                                                labelStyle={styles.labelStyle}
+                                                placeholderStyle={styles.placeholderStyle}
+                                                textErrorStyle={styles.textErrorStyle}
+                                                label="নাম"
+                                                placeholder="নাম লিখুন"
+                                                placeholderTextColor="gray"
+                                                focusColor="#00E0C1"
+                                                onChangeText={value => {
+                                                    onChange(value);
+                                                }}
+                                            />
+                                        )}
+                                        rules={{
+                                            required: {
+                                                value: true,
+                                                message: 'নাম আবশ্যক'
+                                            }
                                         }}
                                     />
-                                )}
-                                rules={{
-                                    required: {
-                                        value: true,
-                                        message: 'পিতা/স্বামীর নাম আবশ্যক'
-                                    }
-                                }}
-                            />
-                            <View>
-                                {errors.guardianName && <Text style={{ fontFamily: "SolaimanLipi_Bold", color: 'red', marginLeft: 2 }}>{errors.guardianName?.message}</Text>}
-                            </View>
-                        </View>
-                        <View>
-                            <Controller
-                                control={control}
-                                name="motherName"
-                                render={({ field: { onChange, value, onBlur } }) => (
-                                    <TextInput
-                                        value={value}
-                                        onBlur={onBlur}
-                                        style={styles.input}
-                                        inputStyle={styles.inputStyle}
-                                        labelStyle={styles.labelStyle}
-                                        placeholderStyle={styles.placeholderStyle}
-                                        textErrorStyle={styles.textErrorStyle}
-                                        label="মাতার নাম"
-                                        placeholder="মাতার নাম লিখুন"
-                                        placeholderTextColor="gray"
-                                        focusColor="#00E0C1"
-                                        onChangeText={value => {
-                                            onChange(value);
+                                    <View>
+                                        {errors.name && <Text style={{ fontFamily: "SolaimanLipi_Bold", color: 'red', marginLeft: 2 }}>{errors.name?.message}</Text>}
+                                    </View>
+                                </View>
+                                <View>
+                                    <Controller
+                                        control={control}
+                                        name="guardianName"
+                                        render={({ field: { onChange, value, onBlur } }) => (
+                                            <TextInput
+                                                value={value}
+                                                onBlur={onBlur}
+                                                style={styles.input}
+                                                inputStyle={styles.inputStyle}
+                                                labelStyle={styles.labelStyle}
+                                                placeholderStyle={styles.placeholderStyle}
+                                                textErrorStyle={styles.textErrorStyle}
+                                                label="পিতা/স্বামীর নাম"
+                                                placeholder="পিতা/স্বামীর নাম লিখুন"
+                                                placeholderTextColor="gray"
+                                                focusColor="#00E0C1"
+                                                onChangeText={value => {
+                                                    onChange(value);
+                                                }}
+                                            />
+                                        )}
+                                        rules={{
+                                            required: {
+                                                value: true,
+                                                message: 'পিতা/স্বামীর নাম আবশ্যক'
+                                            }
                                         }}
                                     />
-                                )}
-                                rules={{
-                                    required: {
-                                        value: true,
-                                        message: 'মাতার নাম আবশ্যক'
+                                    <View>
+                                        {errors.guardianName && <Text style={{ fontFamily: "SolaimanLipi_Bold", color: 'red', marginLeft: 2 }}>{errors.guardianName?.message}</Text>}
+                                    </View>
+                                </View>
+                                <View>
+                                    <Controller
+                                        control={control}
+                                        name="motherName"
+                                        render={({ field: { onChange, value, onBlur } }) => (
+                                            <TextInput
+                                                value={value}
+                                                onBlur={onBlur}
+                                                style={styles.input}
+                                                inputStyle={styles.inputStyle}
+                                                labelStyle={styles.labelStyle}
+                                                placeholderStyle={styles.placeholderStyle}
+                                                textErrorStyle={styles.textErrorStyle}
+                                                label="মাতার নাম"
+                                                placeholder="মাতার নাম লিখুন"
+                                                placeholderTextColor="gray"
+                                                focusColor="#00E0C1"
+                                                onChangeText={value => {
+                                                    onChange(value);
+                                                }}
+                                            />
+                                        )}
+                                        rules={{
+                                            required: {
+                                                value: true,
+                                                message: 'মাতার নাম আবশ্যক'
+                                            }
+                                        }}
+                                    />
+                                    <View>
+                                        {errors.motherName && <Text style={{ fontFamily: "SolaimanLipi_Bold", color: 'red', marginLeft: 2 }}>{errors.motherName?.message}</Text>}
+                                    </View>
+                                </View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+                                    {
+                                        gender?.map(g => <TouchableOpacity key={g.id} onPress={() => {
+                                            setGenderId(g.id);
+                                        }} style={[genderId === g.id ? styles.selectButtonGender : styles.unselectButtonGender]}>
+                                            <Text style={[genderId === g.id ? styles.selectText : styles.unselectText]}>{g.title}</Text>
+                                        </TouchableOpacity>)
                                     }
-                                }}
-                            />
-                            <View>
-                                {errors.motherName && <Text style={{ fontFamily: "SolaimanLipi_Bold", color: 'red', marginLeft: 2 }}>{errors.motherName?.message}</Text>}
+                                </View>
                             </View>
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-                            {
-                                gender?.map(g => <TouchableOpacity key={g.id} onPress={() => {
-                                    setGenderId(g.id);
-                                }} style={[genderId === g.id ? styles.selectButtonGender : styles.unselectButtonGender]}>
-                                    <Text style={[genderId === g.id ? styles.selectText : styles.unselectText]}>{g.title}</Text>
-                                </TouchableOpacity>)
-                            }
-                        </View>
-                    </View>
 
-                </View>
-                <View style={{ flexDirection: 'row', justifyContent: "center" }}>
-                    <TouchableOpacity onPress={handleSubmit(onSubmit)} style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: "#00E0C1", width: vw(80), borderRadius: 10, marginTop: 20, marginBottom: vh(10) }}>
+                        </View>
+                        <View style={{ flexDirection: 'row', justifyContent: "center" }}>
+                            <TouchableOpacity onPress={handleSubmit(onSubmit)} style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: "#00E0C1", width: vw(80), borderRadius: 10, marginTop: 20, marginBottom: vh(10) }}>
 
-                        <Text style={{ fontFamily: "SolaimanLipi_Bold", color: "#fff", fontSize: 18, marginLeft: 5 }}>সাবমিট</Text>
-                        <Image style={{ marginVertical: 10, marginHorizontal: 10 }} source={require('../../assets/Icon/Submit.png')} />
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </ScrollView>
+                                <Text style={{ fontFamily: "SolaimanLipi_Bold", color: "#fff", fontSize: 18, marginLeft: 5 }}>সাবমিট</Text>
+                                <Image style={{ marginVertical: 10, marginHorizontal: 10 }} source={require('../../assets/Icon/Submit.png')} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </View>
     )
 }
 

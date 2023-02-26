@@ -8,7 +8,7 @@ import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import AppLoadingIndicator from '../Shared/AppLoadingIndicator';
 
 export default function OfflineApplication({ application, handleDeleteApplication }) {
-    const { user, logOut } = useContext(AuthContext);
+    const { user, handleQuotaInfo } = useContext(AuthContext);
     const { card_number, name_bn, father_bn, village_id, id } = application;
     const villageName = user?.village?.find(v => v.id === village_id);
     const [loading, setLoading] = useState(false);
@@ -41,8 +41,8 @@ export default function OfflineApplication({ application, handleDeleteApplicatio
                 textBody: <Text style={{ fontFamily: "SolaimanLipi_Bold" }}>Application ID: {data?.app_id}</Text>
             })
             handleDeleteApplication(id);
+            handleQuotaInfo();
         } catch (error) {
-            logOut()
             setLoading(false);
             Dialog.show({
                 type: ALERT_TYPE.DANGER,

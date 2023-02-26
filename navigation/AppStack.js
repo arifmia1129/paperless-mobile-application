@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
     createDrawerNavigator
 } from '@react-navigation/drawer';
@@ -8,10 +8,17 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { Text } from 'react-native';
 import OfflineApplications from '../pages/OfflineApplications/OfflineApplications';
 import Reports from '../pages/Reports/Reports';
+import EmptyQuotaPage from '../components/EmptyQuotaPage';
+import { AuthContext } from '../context/AuthContext';
+import axios from 'axios';
 
 const Drawer = createDrawerNavigator();
 
 export default function AppStack() {
+
+    const { totalGetQuota, totalUsedQuota } = useContext(AuthContext);
+
+
     return (
         <Drawer.Navigator
             screenOptions={{
@@ -22,7 +29,7 @@ export default function AppStack() {
             useLegacyImplementation
             drawerContent={(props) => <CustomDrawer {...props} />}
         >
-            <Drawer.Screen name="AddCitizen" component={AddCitizen}
+            <Drawer.Screen name="AddCitizen" component={(totalGetQuota > totalUsedQuota) ? AddCitizen : EmptyQuotaPage}
                 options={{
                     drawerLabel: ({ color }) => (
                         <Text style={{ fontFamily: "SolaimanLipi_Bold", fontSize: 16, marginLeft: -25, color: { color } }}>নাগরিক যুক্ত করুন</Text>
