@@ -20,10 +20,6 @@ export default function App() {
   return (
     <AuthProvider>
       <AlertNotificationRoot>
-        {/* <Login /> */}
-        {/* <AddCitizen /> */}
-        {/* <AuthStack /> */}
-        {/* <AppStack /> */}
         <AppNav />
       </AlertNotificationRoot>
 
