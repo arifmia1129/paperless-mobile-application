@@ -17,7 +17,7 @@ export default function Login() {
     const onSubmit = async ({ mobile, pin }) => {
         setLoading(true);
         try {
-            const { data } = await axios.post("https://bdfast.app/api/v1/paper/less/login", { mobile, password: pin });
+            const { data } = await axios.post("https://sonod.com.bd/paper/login", { mobile, password: pin });
 
             if (!data.success) {
                 setLoading(false);

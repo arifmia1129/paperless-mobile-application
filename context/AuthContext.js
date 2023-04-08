@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
 
     const handleQuotaInfo = async () => {
         try {
-            const { data } = await axios.get("https://bdfast.app/api/v1/paper/less/quota", {
+            const { data } = await axios.get("https://sonod.com.bd/paper/quota", {
                 headers: {
                     Authorization: `Bearer ${user?.token}`
                 }

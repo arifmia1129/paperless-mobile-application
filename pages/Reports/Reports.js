@@ -18,7 +18,7 @@ export default function Reports() {
 
     const handleReports = async () => {
         setLoading(true);
-        const { data } = await axios.get("https://bdfast.app/api/v1/paper/less/report", {
+        const { data } = await axios.get("https://sonod.com.bd/paper/report", {
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${user?.token}`,

@@ -93,7 +93,7 @@ export default function CitizenInfo() {
     const handleSubmitOnline = async (information) => {
         setLoading(true);
         try {
-            const { data } = await axios.post("https://bdfast.app/api/v1/paper/less/image/no", information, {
+            const { data } = await axios.post("https://sonod.com.bd/paper/image/no", information, {
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${user?.token}`,
